@@ -24,7 +24,7 @@ depends          "users"
 
 supports         "ubuntu"
 supports         "debian"
-supports         "redhat"
+supports         "centos"
 supports         "opensuse"
 supports         "fedora"
 supports         "amazon"
