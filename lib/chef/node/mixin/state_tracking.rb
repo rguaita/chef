@@ -1,5 +1,5 @@
 #--
-# Copyright:: Copyright 2016, Chef Software, Inc.
+# Copyright:: Copyright 2016-2017, Chef Software Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,11 +24,12 @@ class Chef
         attr_reader :__node__
         attr_reader :__precedence__
 
-        def initialize(data = nil, root = self, node = nil, precedence = nil)
+        def initialize(data = nil, root = self, node = nil, precedence = nil, path = nil)
           # __path__ and __root__ must be nil when we call super so it knows
           # to avoid resetting the cache on construction
           data.nil? ? super() : super(data)
-          @__path__ = []
+          @__path__ = path
+          @__path__ ||= []
           @__root__ = root
           @__node__ = node
           @__precedence__ = precedence
