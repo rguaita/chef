@@ -195,8 +195,8 @@ class Chef
         if symbol == :to_ary
           super
         elsif args.empty?
-          if key?(symbol)
-            self[symbol]
+          if key?(symbol.to_s)
+            self[symbol.to_s]
           else
             raise NoMethodError, "Undefined method or attribute `#{symbol}' on `node'"
           end
@@ -218,7 +218,7 @@ class Chef
         Mash.new(self)
       end
 
-      def to_hash
+      def to_h
         h = Hash.new
         each_pair do |k, v|
           h[k] =
