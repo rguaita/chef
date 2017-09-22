@@ -64,7 +64,7 @@ class Chef
 
       methods.each do |method|
         define_method method do |*args, &block|
-          merged_array.public_send(method, *args, &block)
+          merged_lazy_array.public_send(method, *args, &block)
         end
       end
 
@@ -135,7 +135,7 @@ class Chef
         components << get_array(:@automatic)
         highest = components.compact.last
         if highest.is_a?(Array)
-          highest.map { |x| convert_value(x) }
+          highest.each_with_index.map { |x, i| convert_value(x, __path__ + [ i ] ) }
         end # else nil
       end
 
