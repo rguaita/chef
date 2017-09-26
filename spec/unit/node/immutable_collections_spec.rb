@@ -1,6 +1,6 @@
 #
 # Author:: Daniel DeLeo (<dan@chef.io>)
-# Copyright:: Copyright 2012-2016, Chef Software Inc.
+# Copyright:: Copyright 2012-2017, Chef Software Inc.
 # License:: Apache License, Version 2.0
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -88,7 +88,6 @@ describe Chef::Node::ImmutableMash do
       puts @copy.class
       puts @immutable_mash.class
       expect(@immutable_mash).to eq(@copy)
-      expect(@copy).to eq(@immutable_mash)
     end
 
     it "should allow mutation" do
@@ -132,9 +131,11 @@ end
 describe Chef::Node::ImmutableArray do
 
   before do
-    @immutable_array = Chef::Node::ImmutableArray.new(%w{foo bar baz} + Array(1..3) + [nil, true, false, [ "el", 0, nil ] ])
-    immutable_mash = Chef::Node::ImmutableMash.new({ "m" => "m" })
-    @immutable_nested_array = Chef::Node::ImmutableArray.new(["level1", @immutable_array, immutable_mash])
+    @node = Chef::Node.new()
+    @node.attributes.default = { "key" => ["level1", %w{foo bar baz} + Array(1..3) + [nil, true, false, [ "el", 0, nil ] ], { "m" => "m" }] }
+    @immutable_array = @node["key"][1]
+    @immutable_mash = @node["key"][2]
+    @immutable_nested_array = @node["key"]
   end
 
   ##
@@ -206,7 +207,7 @@ describe Chef::Node::ImmutableArray do
     end
 
     it "should create an array with the same content" do
-      expect(@copy).to eq(@immutable_nested_array)
+      expect(@immutable_nested_array).to eq(@copy)
     end
 
     it "should allow mutation" do

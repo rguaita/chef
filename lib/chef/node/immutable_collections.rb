@@ -34,10 +34,6 @@ class Chef
           value
         end
       end
-
-      def immutablize(value)
-        convert_value(value)
-      end
     end
 
     # == ImmutableArray
@@ -66,9 +62,7 @@ class Chef
       private :internal_push
 
       def initialize(array_data = [])
-        array_data.each do |value|
-          internal_push(immutablize(value))
-        end
+        # Immutable collections no longer have initialized state
       end
 
       # For elements like Fixnums, true, nil...
@@ -100,8 +94,9 @@ class Chef
 
       alias_method :to_array, :to_a
 
-      def [](key)
-        merged_lazy_array[key]
+      # FIXME: this absolutely needs caching
+      def [](*args)
+        merged_lazy_array[*args]
       end
 
       private
@@ -136,10 +131,6 @@ class Chef
         end # else nil
       end
 
-      def merged_array
-        merged_lazy_array.to_a
-      end
-
       # needed for __path__
       def convert_key(key)
         key
@@ -170,9 +161,6 @@ class Chef
 
       methods.each do |method|
         define_method method do |*args, &block|
-          #raise "foo" if method == :each_pair
-          #puts "METHOD: #{method}"
-          #super(*args, &block)
           merged_lazy_hash.public_send(method, *args, &block)
         end
       end
@@ -184,9 +172,7 @@ class Chef
       end
 
       def initialize(mash_data = {})
-        #mash_data.each do |key, value|
-        #  internal_set(key, value)
-        #end
+        # Immutable collections no longer have initialized state
       end
 
       alias :attribute? :has_key?
@@ -256,10 +242,7 @@ class Chef
             if subhash.kind_of?(Hash)
               subhash.keys.each do |key|
                 next if hash.key?(key)
-                #hash[key] = subhash[key]
                 hash[key] = convert_value(subhash[key], __path__ + [ key ])
-                #puts "BOOM: #{hash[key].__path__}"
-                #puts hash[key].class
               end
             else
               return hash
@@ -268,10 +251,6 @@ class Chef
         end
         hash
       end
-
-      #def merged_hash
-      #  merged_lazy_hash.to_h
-      #end
 
       prepend Chef::Node::Mixin::StateTracking
       prepend Chef::Node::Mixin::ImmutablizeHash
